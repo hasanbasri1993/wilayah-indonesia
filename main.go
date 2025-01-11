@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"time"
 	"wilayah/model"
 	"wilayah/pkg"
 )
@@ -48,26 +49,39 @@ func main() {
 			kodeProvinsi := kode[:2]
 			kabupatenData = append(kabupatenData, model.Kabupaten{KodeKabupaten: kode, Nama: nama, KodeProvinsi: kodeProvinsi})
 		case 8:
-			kodeKabupaten := kode[3:8]
+			kodeKabupaten := kode[:5]
 			kecamatanData = append(kecamatanData, model.Kecamatan{KodeKecamatan: kode, Nama: nama, KodeKabupaten: kodeKabupaten})
 		case 13:
-			kodeKecamatan := kode[9:13]
+			kodeKecamatan := kode[:8]
 			kelurahanData = append(kelurahanData, model.Kelurahan{KodeKelurahan: kode, Nama: nama, KodeKecamatan: kodeKecamatan})
 		}
 	}
 
+	fmt.Println("Provinsi. Writing to CSV...")
 	err = pkg.WriteCSV("provinsi.csv", provinsiData)
 	if err != nil {
 		return
 	}
+	fmt.Println("Done")
+	time.Sleep(1 * time.Second)
+
+	fmt.Println("Kabupaten. Writing to CSV...")
 	err = pkg.WriteCSV("kabupaten.csv", kabupatenData)
 	if err != nil {
 		return
 	}
+	fmt.Println("Done")
+	time.Sleep(1 * time.Second)
+
+	fmt.Println("Kecamatan. Writing to CSV...")
 	err = pkg.WriteCSV("kecamatan.csv", kecamatanData)
 	if err != nil {
 		return
 	}
+	fmt.Println("Done")
+	time.Sleep(1 * time.Second)
+
+	fmt.Println("Kelurahan. Writing to CSV...")
 	err = pkg.WriteCSV("kelurahan.csv", kelurahanData)
 	if err != nil {
 		return
@@ -84,15 +98,16 @@ func main() {
 	for i := range kelurahanData {
 		if kodepos, found := kodeposMap[strings.ReplaceAll(kelurahanData[i].KodeKelurahan, ".", "")]; found {
 			kelurahanData[i].KodePos = kodepos
-			fmt.Println("KodePos found for", kelurahanData[i].KodeKelurahan, ":", kodepos)
 		}
 	}
 
+	fmt.Println("Update kodepos. Writing to CSV...")
 	err = pkg.WriteCSV("kelurahan.csv", kelurahanData)
 	if err != nil {
 		return
 	}
-
+	fmt.Println("Update kodepos. Done.")
+	time.Sleep(1 * time.Second)
 	fmt.Println("Done")
 	pkg.RemoveTemp()
 }
